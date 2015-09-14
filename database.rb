@@ -4,7 +4,7 @@ require_relative 'employee'
 
 class Database
   def initialize
-    @people = []
+    # @people = []
 
     byron = Student.new
     byron.name = "byron"
@@ -43,8 +43,12 @@ class Database
     @people = [byron, sanam, gavin, jason]
   end
 
+  def find_person_by_name(name)
+    @people.find { |person| /#{name}/ =~ person.name }
+  end
+
   def search_person(name)
-    person = @people.find { |person| person.name.include?(name) }
+    person = find_person_by_name(name)
     if person
       puts "Name: #{person.name.capitalize}"
       puts "Address: #{person.address}"
@@ -57,7 +61,7 @@ class Database
   end
 
   def delete_person(name)
-    person = @people.find { |person| person.name.include?(name) }
+    person = find_person_by_name(name)
     if person
       puts "#{name} has been deleted."
       @people.delete(person)
@@ -66,8 +70,23 @@ class Database
     end
   end
 
+  def add_person(name)
+    puts "Is #{name.capitalize} a (S)tudent or (E)mployee?"
+    role = gets.chomp.upcase
+      if role == "S"
+        @people << add_student(name)
+        p @people
+      elsif role == "E"
+        puts "Please enter the Employee's name:"
+        name = gets.chomp
+        @person << add_employee(name)
+        p @people
+      else
+        puts "You entered an invalid choice. Please choose again."
+      end
+  end
+
   def add_student(name)
-    puts "The person's name is #{name}"
     person = Student.new
     person.name = name
     puts "Please enter #{name}'s address:"
@@ -82,12 +101,10 @@ class Database
     puts "Please enter #{name}'s Github account:"
     person.github = gets.chomp
     puts "#{name}'s Github account is #{person.github}."
-    @people = person
-    p @people
+    return person
   end
 
   def add_employee(name)
-    puts "The person's name is #{name}"
     person = Employee.new
     person.name = name
     puts "Please enter #{name}'s address:"
@@ -111,8 +128,7 @@ class Database
     puts "Please enter #{name}'s Github account:"
     person.github = gets.chomp
     puts "#{name}'s Github account is #{person.github}."
-    @people = person
-    p @people
+    return person
   end
 end
 
@@ -122,24 +138,14 @@ loop do
   puts "What's your choice? (A)dd person/(S)earch Person/(D)elete Person/(Q)uit:"
   choice = gets.chomp.upcase
   if choice == "A"
-  puts "You chose to add a person."
-  puts "Is this person a (S)tudent or (E)mployee?"
-  role = gets.chomp.upcase
-    if role == "S"
-      puts "Please enter the Student's name:"
-      name = gets.chomp
-      database.add_student(name)
-    elsif role == "E"
-      puts "Please enter the Employee's name:"
-      name = gets.chomp
-      database.add_employee(name)
-    else
-      puts "You entered an invalid choice. Please choose again."
-    end
+    puts "Please enter the Person's name:"
+    name = gets.chomp
+    database.add_person(name)
   elsif choice == "S"
     puts "You chose to search for someone."
     puts "What is person's name?"
     name = gets.chomp
+    puts "Search results for \"#{name}\"..."
     database.search_person(name)
   elsif choice == "D"
     puts "You have chosen to delete someone."
